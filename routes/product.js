@@ -3,9 +3,36 @@ import productModel from "../models/product.js";
 const router = express.Router()
 
 router.get("/", (req, res) => {
-    res.json({
-        msg: "successful get all products"
-    })
+    productModel
+        .find()
+        .then(products => {
+            res.json({
+                msg: "successful all products",
+                count: products.length,
+                products
+            })
+        })
+        .catch(err => {
+            res.status(404).json({
+                msg: err.message
+            })
+        })
+})
+
+router.get("/:id", (req, res) => {
+    productModel
+        .findById(req.params.id)
+        .then(product => {
+            res.json({
+                msg: `successful get ${req.params.id}`,
+                product
+            })
+        })
+        .catch(err => {
+            res.status(404).json({
+                msg: err.message
+            })
+        })
 })
 
 router.post("/", (req, res) => {
@@ -20,8 +47,10 @@ router.post("/", (req, res) => {
             res.json({
                 msg: "successful post new product",
                 newProductInfo: {
+                    id: result.id,
                     name: result.name,
-                    price: result.price
+                    price: result.price,
+                    desc: result.desc
                 }
             })
         })

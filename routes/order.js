@@ -3,9 +3,36 @@ import orderModel from "../models/order.js";
 const router = express.Router()
 
 router.get("/", (req, res) => {
-    res.json({
-        msg: "successful get all orders"
-    })
+    orderModel
+        .find()
+        .then(orders => {
+            res.json({
+                msg: `successful get orders`,
+                count: orders.length,
+                orders
+            })
+        })
+        .catch(err => {
+            res.status(404).json({
+                msg: err.message
+            })
+        })
+})
+
+router.get("/:id", (req, res) => {
+    orderModel
+        .findById(req.params.id)
+        .then(order => {
+            res.json({
+                msg: `successful get ${req.params.id}`,
+                order
+            })
+        })
+        .catch(err => {
+            res.status(404).json({
+                msg: err.message
+            })
+        })
 })
 
 router.post("/", (req, res) => {

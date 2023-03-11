@@ -56,4 +56,34 @@ router.post("/", (req, res) => {
         })
 })
 
+router.delete("/", (req, res) => {
+    orderModel
+        .deleteMany()
+        .then(_ => {
+            res.json({
+                msg: `successful delete all data`
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                msg: err.message
+            })
+        })
+})
+
+router.delete("/:id", (req, res) => {
+    orderModel
+        .findByIdAndDelete()
+        .then(_ => {
+            res.json({
+                msg: `successful delete data`
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                msg: err.message
+            })
+        })
+})
+
 export default router

@@ -23,6 +23,11 @@ router.get("/:id", (req, res) => {
     productModel
         .findById(req.params.id)
         .then(product => {
+            if(!product){
+                res.json({
+                    msg: `no data`
+                })
+            }
             res.json({
                 msg: `successful get ${req.params.id}`,
                 product
@@ -52,6 +57,36 @@ router.post("/", (req, res) => {
                     price: result.price,
                     desc: result.desc
                 }
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                msg: err.message
+            })
+        })
+})
+
+router.delete("/", (req, res) => {
+    productModel
+        .deleteMany()
+        .then(_ =>{
+            res.json({
+                msg: `successful delete all data`
+            })
+        })
+        .catch(err => {
+            res.status.json({
+                msg: err.message
+            })
+        })
+})
+
+router.delete("/:id", (req, res) => {
+    productModel
+        .findByIdAndDelete(req.params.id)
+        .then(_ => {
+            res.json({
+                msg: `successful delete data`
             })
         })
         .catch(err => {

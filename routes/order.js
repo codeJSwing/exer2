@@ -2,21 +2,21 @@ import express from "express";
 import orderModel from "../models/order.js";
 const router = express.Router()
 
-router.get("/", (req, res) => {
-    orderModel
-        .find()
-        .then(orders => {
-            res.json({
-                msg: `successful get orders`,
-                count: orders.length,
-                orders
-            })
+router.get("/", async (req, res) => {
+    try{
+        const orders = await orderModel.find()
+        return res.json({
+            msg: "successful get orders",
+            orders: orders.map(order => ({
+                title: order.title
+            }))
         })
-        .catch(err => {
-            res.status(404).json({
-                msg: err.message
-            })
+
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
         })
+    }
 })
 
 router.get("/:id", (req, res) => {
@@ -35,25 +35,23 @@ router.get("/:id", (req, res) => {
         })
 })
 
-router.post("/", (req, res) => {
-    const newOrder = new orderModel({
-        title: req.body.orderTitle
-    })
-    newOrder
-        .save()
-        .then(result => {
-            res.json({
-                msg: "successful post new order",
-                orderInfo: {
-                    title: result.title
-                }
-            })
+router.post("/", async (req, res) => {
+    const {title, quantity} = req.body
+    try{
+        const newOrder = new orderModel({
+            title,
+            quantity
         })
-        .catch(err => {
-            res.status(404).json({
-                msg: err.message
-            })
+        const createOrder = await newOrder.save()
+        return res.json({
+            msg: `successful create new order`,
+            createOrder
         })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
+        })
+    }
 })
 
 router.delete("/", (req, res) => {
@@ -77,6 +75,25 @@ router.delete("/:id", (req, res) => {
         .then(_ => {
             res.json({
                 msg: `successful delete data`
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                msg: err.message
+            })
+        })
+})
+
+router.put("/", (req, res) => {
+    const updateOps = {};
+    for (const ops of req.body){
+        updateOps[ops.propName] = ops.value;
+    }
+    orderModel
+        .findByIdAndUpdate(req.params.id, {$set: updateOps})
+        .then(_ => {
+            res.json({
+                msg: `successful update order by ${req.params.id}`
             })
         })
         .catch(err => {

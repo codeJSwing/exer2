@@ -1,0 +1,4 @@
+
+Yjavascript:S1481"7Remove the declaration of the unused 'orders' variable.(í”Å*8ÌÞ¶Çí0
+Vjavascript:S1854"4Remove this useless assignment to variable "orders".(í”Å*8ÍÞ¶Çí0
+Sjavascript:S4123"1Refactor this redundant 'await' on a non-promise.(í”Å*8ê†¶Çí0

@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const orderSchema = mongoose.Schema({
     id: mongoose.Schema.Types.ObjectId,
     count: Number,
-    title: String
+    title: String,
+    quantity: Number
 })
 
 const orderModel = mongoose.model("Order", orderSchema)

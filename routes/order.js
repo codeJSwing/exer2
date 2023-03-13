@@ -8,7 +8,9 @@ router.get("/", async (req, res) => {
         return res.json({
             msg: "successful get orders",
             orders: orders.map(order => ({
-                title: order.title
+                title: order.title,
+                quantity: order.quantity,
+                id: order._id
             }))
         })
 
@@ -54,53 +56,52 @@ router.post("/", async (req, res) => {
     }
 })
 
-router.delete("/", (req, res) => {
-    orderModel
-        .deleteMany()
-        .then(_ => {
-            res.json({
-                msg: `successful delete all data`
-            })
+router.delete("/", async(req, res) => {
+    try{
+        const deleteOrder = await orderModel.deleteMany()
+        return res.json({
+            msg: `successful deleted all data`,
+            deleteOrder
         })
-        .catch(err => {
-            res.status(500).json({
-                msg: err.message
-            })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
         })
-})
-
-router.delete("/:id", (req, res) => {
-    orderModel
-        .findByIdAndDelete()
-        .then(_ => {
-            res.json({
-                msg: `successful delete data`
-            })
-        })
-        .catch(err => {
-            res.status(500).json({
-                msg: err.message
-            })
-        })
-})
-
-router.put("/", (req, res) => {
-    const updateOps = {};
-    for (const ops of req.body){
-        updateOps[ops.propName] = ops.value;
     }
-    orderModel
-        .findByIdAndUpdate(req.params.id, {$set: updateOps})
-        .then(_ => {
-            res.json({
-                msg: `successful update order by ${req.params.id}`
-            })
+})
+
+router.delete("/:id", async (req, res) => {
+    const {id} = req.params
+    try {
+        const deleteOrder = await orderModel.findByIdAndDelete(id)
+        return res.json({
+            msg: `successfully deleted order`,
+            deleteOrder
         })
-        .catch(err => {
-            res.status(500).json({
-                msg: err.message
-            })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
         })
+    }
+})
+
+router.put("/:id", async (req, res) => {
+    const {id} = req.params
+    try {
+        const updateOps = {};
+        for(const ops of req.body){
+            updateOps[ops.propName] = ops.value;
+        }
+        const updateOrder = await orderModel.findByIdAndUpdate(id, {$set: updateOps})
+        return res.json({
+            msg: `successfully updated order by ${id}`,
+            updateOrder
+        })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
+        })
+    }
 })
 
 export default router

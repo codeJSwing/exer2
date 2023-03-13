@@ -1,5 +1,6 @@
 import express from "express"
 import productModel from "../models/product.js";
+import product from "../models/product.js";
 const router = express.Router()
 
 router.get("/", async (req, res) => {
@@ -21,20 +22,19 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.get("/:id", async(req, res) => {
+router.get("/:id", async (req, res) => {
     const {id} = req.params
     try{
         const product = await productModel.findById(id)
         if(!product){
-            res.json({
-                msg: `no data`
+            return res.json({
+                msg: "no data"
             })
         }
         return res.json({
             msg: "successful get product",
             product
         })
-
     } catch (err) {
         res.status(500).json({
             msg: err.message
@@ -63,34 +63,52 @@ router.post("/", async (req, res) => {
     }
 })
 
-router.delete("/", (req, res) => {
-    productModel
-        .deleteMany()
-        .then(_ =>{
-            res.json({
-                msg: `successful delete all data`
-            })
+router.delete("/", async (req, res) => {
+    try{
+        const deleteProduct = await productModel.deleteMany()
+        return res.json({
+            msg: `successful deleted all data`,
+            deleteProduct
         })
-        .catch(err => {
-            res.status.json({
-                msg: err.message
-            })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
         })
+    }
 })
 
-router.delete("/:id", (req, res) => {
-    productModel
-        .findByIdAndDelete(req.params.id)
-        .then(_ => {
-            res.json({
-                msg: `successful delete data`
-            })
+router.delete("/:id", async(req, res) => {
+    const {id} = req.params
+    try{
+        const deleteOneProduct = await productModel.findByIdAndRemove(id)
+        return res.json({
+            msg: `successful deleted one order`,
+            deleteOneProduct
         })
-        .catch(err => {
-            res.status(500).json({
-                msg: err.message
-            })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
         })
+    }
+})
+
+router.put("/:id", async (req, res) => {
+    const {id} = req.params
+    try {
+        const updateOps = {};
+        for (const ops of req.body){
+            updateOps[ops.propName] = ops.value;
+        }
+        const putProduct = await productModel.findByIdAndUpdate(id, {$set: updateOps})
+        return res.json({
+            msg: `successfully updated product by ${id}`,
+            putProduct
+        })
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message
+        })
+    }
 })
 
 export default router
